@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  retail_postgres:
+    image: postgres:14
+    container_name: retail_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: retail
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  retail_minio:
+    image: minio/minio
+    container_name: retail_minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  retail_airflow:
+    image: apache/airflow:2.7.0
+    container_name: retail_airflow
+    restart: always
+    command: standalone
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__FERNET_KEY=YOUR_FERNET_KEY
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@retail_postgres:5432/retail
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    depends_on:
+      - retail_postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+
+  retail_superset:
+    image: apache/superset
+    container_name: retail_superset
+    environment:
+      SUPERSET_ENV: development
+      SUPERSET_LOAD_EXAMPLES: "yes"
+    ports:
+      - "8088:8088"
+    depends_on:
+      - retail_postgres
+    volumes:
+      - superset_home:/app/superset_home
+
+volumes:
+  postgres_data:
+  minio_data:
+  superset_home:
