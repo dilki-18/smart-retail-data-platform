@@ -1,0 +1,19 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore Airflow temp files
+dags/__pycache__/
+airflow_home/
+
+# Ignore Docker artifacts
+docker-compose.override.yml
+Dockerfile.superset
+
+# Ignore system files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  superset:
+    build:
+      context: .
+      dockerfile: Dockerfile.superset
+    volumes:
+      - ./requirements-local.txt:/app/requirements-local.txt
