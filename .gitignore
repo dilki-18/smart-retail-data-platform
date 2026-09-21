@@ -14,6 +14,10 @@ airflow_home/
 docker-compose.override.yml
 Dockerfile.superset
 
+# Ignore dbt generated files
+dbt_smart_retail/target/
+dbt_smart_retail/logs/
+
 # Ignore system files
 .DS_Store
 Thumbs.db

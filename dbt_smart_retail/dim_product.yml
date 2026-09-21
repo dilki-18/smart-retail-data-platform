@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: dim_product
+    description: "Unified product catalogue"
+    columns:
+      - name: product_id
+        description: "Primary key for products"
+        tests:
+          - not_null
+          - unique

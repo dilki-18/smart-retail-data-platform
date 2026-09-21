@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: dim_store
+    description: "Store and region information"
+    columns:
+      - name: store_id
+        description: "Primary key for stores"
+        tests:
+          - not_null
+          - unique

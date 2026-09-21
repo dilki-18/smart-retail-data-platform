@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: "Clean customer profile with hashed email"
+    columns:
+      - name: customer_id
+        description: "Primary key for customers"
+        tests:
+          - not_null
+          - unique
+      - name: loyalty_tier
+        description: "Customer loyalty tier classification"
+        tests:
+          - accepted_values:
+              values: ['Gold', 'Silver', 'Bronze', 'NULL']

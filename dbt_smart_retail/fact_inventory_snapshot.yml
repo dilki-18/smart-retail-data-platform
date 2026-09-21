@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: fact_inventory_snapshot
+    description: "Daily stock position by product and location"
+    columns:
+      - name: product_id
+        description: "Product tracked in the inventory snapshot"
+        tests:
+          - not_null
+      - name: warehouse_id
+        description: "Warehouse or location for the inventory snapshot"
+        tests:
+          - not_null
+      - name: snapshot_date
+        description: "Date of the inventory snapshot"
+        tests:
+          - not_null

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   retail_postgres:
     image: postgres:14
