@@ -7,6 +7,36 @@ import os
 from sqlalchemy import create_engine
 
 # --- ETL Functions ---
+def preprocess_data(customers, products, sales, suppliers):
+    customers = customers.copy()
+    products = products.copy()
+    sales = sales.copy()
+    suppliers = suppliers.copy()
+
+    customers = customers.dropna(subset=["customer_id"])
+    customers["name"] = customers["name"].fillna("unknown")
+    customers["region"] = customers["region"].fillna("unknown")
+    customers["loyalty_tier"] = customers["loyalty_tier"].fillna("unknown")
+    customers["email"] = customers["email"].where(
+        customers["email"].astype("string").str.fullmatch(
+            r"[^@\s]+@[^@\s]+\.[^@\s]+", na=False
+        )
+    )
+
+    sales["quantity"] = pd.to_numeric(sales["quantity"], errors="coerce")
+    sales["price"] = pd.to_numeric(sales["price"], errors="coerce")
+    sales = sales.dropna(
+        subset=["transaction_id", "product_id", "customer_id", "store_id", "quantity", "price", "timestamp"]
+    )
+    sales = sales[(sales["quantity"] > 0) & (sales["price"] > 0)]
+    sales = sales.drop_duplicates(subset=["transaction_id"], keep="first")
+
+    products = products.fillna({"product_id": "unknown", "store_id": "unknown"})
+    suppliers = suppliers.fillna("unknown")
+
+    return customers, products, sales, suppliers
+
+
 def extract_data(**kwargs):
     dataset_path = "/opt/airflow/dags/dataset"
 
@@ -28,6 +58,10 @@ def transform_data(**kwargs):
     products = pd.DataFrame(kwargs['ti'].xcom_pull(key='products'))
     sales = pd.DataFrame(kwargs['ti'].xcom_pull(key='sales'))
     suppliers = pd.DataFrame(kwargs['ti'].xcom_pull(key='suppliers'))
+
+    customers, products, sales, suppliers = preprocess_data(
+        customers, products, sales, suppliers
+    )
 
     # Example transformation: join sales with customers + products
     fact_sales = sales.merge(customers, on='customer_id') \
